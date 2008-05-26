@@ -1,5 +1,5 @@
 NAME
-	powncefs -- A Fuse filesystem for your friends' files on Pownce.
+	powncefs -- A Fuse filesystem for your friends' files on Pownce
 
 SYNOPSIS
 	./powncefs.py <mountpoint>
