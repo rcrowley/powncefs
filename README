@@ -1,0 +1,30 @@
+NAME
+	powncefs -- A Fuse filesystem for your friends' files on Pownce.
+
+SYNOPSIS
+	./powncefs.py <mountpoint>
+
+DESCRIPTION
+	Creates a directory for each of your friends on Pownce containing
+	all of the files they've uploaded to the site.
+
+DEPENDENCIES
+	First, you'll need to install Leah's OAuth Python library.  I
+	don't know if this is the best way to do it but it actually works,
+	so whatever.
+
+	$ cd /usr/lib/python2.5/site-packages/
+	$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
+
+	You will also need Fuse and the Python bindings.  In Ubuntu, these
+	are easy to fetch.
+
+	$ sudo apt-get install python-fuse
+
+VERSION
+	0.1
+	$Id: README 5 2008-03-22 19:51:02Z rcrowley $
+
+SEE ALSO
+	http://rcrowley.org/2008/03/22/powncefs/
+	http://svn.rcrowley.org/svn/powncefs/
