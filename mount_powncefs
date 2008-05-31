@@ -25,8 +25,7 @@ def main(py, mnt):
 		def hup(sig, frame):
 			os._exit(1)
 		signal.signal(signal.SIGHUP, hup)
-		sys.argv = [py, mnt]
-		powncefs.main()
+		os.execl(os.path.abspath(py), py, mnt)
 	else:
 		for i in range(300):
 			if not os.path.ismount(mnt):
@@ -40,10 +39,8 @@ def main(py, mnt):
 			os.kill(pid, signal.SIGHUP)
 			os.waitpid(pid, 0)
 			sys.exit(3)
-      
 
 if '__main__' == __name__:
-
 	if 'none' == sys.argv[1]:
 		print "We need a script to run\n"
 		sys.exit(4)
@@ -52,8 +49,4 @@ if '__main__' == __name__:
 	if not os.path.isfile(py):
 		sys.exit(5)
 	mnt = sys.argv[2]
-
-	sys.path.append(os.path.abspath(os.path.dirname(py)))
-	import powncefs
-
 	main(py, mnt)

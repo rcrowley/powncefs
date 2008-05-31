@@ -19,11 +19,9 @@ California, 94105, USA.
 #   and it's always nice to have some breathing room
 API_TTL = 60 * 45
 
-import os, sys
+import os, stat, sys, fcntl, time
+import posix
 from errno import *
-from stat import *
-import fcntl
-import time
 
 import fuse
 from fuse import Fuse
@@ -53,9 +51,6 @@ class PownceFS(Fuse):
 	"""
 
 	def __init__(self, *args, **kw):
-		print str(args)
-		print str(kw)
-		print str(sys.argv)
 		Fuse.__init__(self, *args, **kw)
 
 		# Auth with Pownce unless we have stored credentials
@@ -139,7 +134,7 @@ class PownceFS(Fuse):
 		def __init__(self, token):
 			self.token = token
 			self.inode = inode()
-			self.time = 0
+			self.time = 472545720
 			self.dev = 409089L
 			self.children = {}
 			self.name = None
@@ -149,13 +144,13 @@ class PownceFS(Fuse):
 
 		def getattr(self):
 			return os.stat_result((
-				S_IFDIR | 0555,
-				self.inode,
+				stat.S_IFDIR | 0555,
+				long(self.inode),
 				self.dev,
-				2L,
+				2,
 				os.getuid(),
 				os.getgid(),
-				0,
+				4096L,
 				int(self.time),
 				int(self.time),
 				int(self.time)
@@ -235,10 +230,10 @@ class PownceFS(Fuse):
 
 		def getattr(self):
 			return os.stat_result((
-				S_IFREG | 0444,
+				stat.S_IFREG | 0444,
 				self.inode,
 				self.dev,
-				1L,
+				1,
 				os.getuid(),
 				os.getgid(),
 				long(self.size),
@@ -306,7 +301,7 @@ class PownceFS(Fuse):
 	def utime(self, path, times):
 		logging.debug('[info] utime, path: %s, times: %s' % (path, times))
 	def statfs(self):
-		logging.debug('[info] statfs')
+		logging.debug('[info] statfs - what the hell is this?')
 
 def main():
 	try:
