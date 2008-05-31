@@ -1,12 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
-PownceFS 0.1
+PownceFS 0.2
 Richard Crowley
 2008-03-19
 
-http://svn.rcrowley.org/svn/powncefs/
-$Id: powncefs.py 3 2008-03-22 19:00:09Z rcrowley $
+http://github.com/rcrowley/powncefs/
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -54,6 +53,9 @@ class PownceFS(Fuse):
 	"""
 
 	def __init__(self, *args, **kw):
+		print str(args)
+		print str(kw)
+		print str(sys.argv)
 		Fuse.__init__(self, *args, **kw)
 
 		# Auth with Pownce unless we have stored credentials
@@ -99,6 +101,7 @@ class PownceFS(Fuse):
 			return None
 
 	def getattr(self, path):
+		logging.debug('getattr %s' % path)
 		node = self._find(path)
 		if node is None:
 			return -1

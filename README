@@ -2,29 +2,73 @@ NAME
 	powncefs -- A Fuse filesystem for your friends' files on Pownce
 
 SYNOPSIS
+
+	Linux:
+
 	./powncefs.py <mountpoint>
+	ls -l <mountpoint>
+	fusermount -u <mountpoint>
+
+	Mac:
+
+	sudo mount -t powncefs ./powncefs.py <mountpoint>
+	ls -l
+	sudo umount python2.5@fuse0
 
 DESCRIPTION
 	Creates a directory for each of your friends on Pownce containing
 	all of the files they've uploaded to the site.
 
 DEPENDENCIES
-	First, you'll need to install Leah's OAuth Python library.  I
-	don't know if this is the best way to do it but it actually works,
-	so whatever.
+	FUSE or Fuse or fuse, the Filesystem in USEr space
+	Leah's OAuth Python library
+
+	Linux (Ubuntu):
+
+	$ sudo apt-get install python-fuse python-json
 
 	$ cd /usr/lib/python2.5/site-packages/
 	$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
 
-	You will also need Fuse and the Python bindings.  In Ubuntu, these
-	are easy to fetch.
+	Mac OS X Leopard:
 
-	$ sudo apt-get install python-fuse
+	Install Xcode from http://developer.apple.com/tools/download/
+	Install MacPorts 1.6 from http://www.macports.org/install.php
+	$ export PATH="/opt/local/bin:~/bin:$PATH"
+	$ export MANPATH="/opt/local/share/man:$MANPATH"
+	$ sudo port selfupdate
+
+	$ sudo port install macfuse fuse-bindings-python25
+	The line above will fail, so edit the fuse-bindings-python and
+	fuse-bindings-python25 Portfiles, replacing dependencies on fusefs
+	and libfuse with dependencies on macfuse
+	$ sudo port install macfuse fuse-bindings-python25
+
+	$ sudo port install py25-hashlib
+	$ cd /opt/local/lib/python2.5/site-packages/
+	$ sudo port install wget
+	$ sudo wget \
+	  http://internap.dl.sourceforge.net/sourceforge/json-py/json-py-3_4.zip
+	$ sudo unzip json-py-3_4.zip \*.py
+	$ sudo rm json-py-3_4.zip
+
+	$ cd /opt/local/lib/python2.5/site-packages/
+	$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
 
 VERSION
-	0.1
-	$Id: README 5 2008-03-22 19:51:02Z rcrowley $
+	0.2
+
+DATE
+	2008-05-25
+
+AUTHOR
+	Richard Crowley <r@rcrowley.org>
 
 SEE ALSO
-	http://rcrowley.org/2008/03/22/powncefs/
-	http://svn.rcrowley.org/svn/powncefs/
+	<http://rcrowley.org/2008/03/22/powncefs/>
+	<http://randomfoo.net/blog/id/4158>
+
+LICENSE
+	This work is licensed under a Creative Commons
+	Attribution-Noncommercial-Share Alike 3.0 Unported License
+	<http://creativecommons.org/licenses/by-nc-sa/3.0/>

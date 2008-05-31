@@ -8,8 +8,7 @@ Richard Crowley
 Based almost completely on Leah's pownce_oauth_test.py from:
 http://groups.google.com/group/pownceapi/browse_thread/thread/8cdf67c66b65fe58
 
-http://svn.rcrowley.org/svn/powncefs/
-$Id: api.py 3 2008-03-22 19:00:09Z rcrowley $
+http://github.com/rcrowley/powncefs/
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit

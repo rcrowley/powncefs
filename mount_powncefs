@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+"""
+PownceFS 0.2
+Richard Crowley
+2008-05-26
+
+http://github.com/rcrowley/powncefs/
+
+This work is licensed under the Creative Commons Attribution-Share Alike
+3.0 Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco,
+California, 94105, USA.
+"""
+
+import sys
+import os
+import signal
+import time
+
+def main(py, mnt):
+	pid = os.fork()
+	if 0 == pid:
+		def hup(sig, frame):
+			os._exit(1)
+		signal.signal(signal.SIGHUP, hup)
+		sys.argv = [py, mnt]
+		powncefs.main()
+	else:
+		for i in range(300):
+			if not os.path.ismount(mnt):
+				pid, status = os.waitpid(pid, os.WNOHANG)
+				if 0 != pid:
+					sys.exit(2)
+			else:
+				break
+			time.sleep(1)
+		if not os.path.ismount(mnt):
+			os.kill(pid, signal.SIGHUP)
+			os.waitpid(pid, 0)
+			sys.exit(3)
+      
+
+if '__main__' == __name__:
+
+	if 'none' == sys.argv[1]:
+		print "We need a script to run\n"
+		sys.exit(4)
+	else:
+		py = sys.argv[1]
+	if not os.path.isfile(py):
+		sys.exit(5)
+	mnt = sys.argv[2]
+
+	sys.path.append(os.path.abspath(os.path.dirname(py)))
+	import powncefs
+
+	main(py, mnt)
