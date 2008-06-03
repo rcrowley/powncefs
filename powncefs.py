@@ -19,9 +19,7 @@ California, 94105, USA.
 #   and it's always nice to have some breathing room
 API_TTL = 60 * 45
 
-import os, stat, sys, fcntl, time
-import posix
-from errno import *
+import os, stat, sys, fcntl, time, posix, errno
 
 import fuse
 from fuse import Fuse
@@ -59,7 +57,6 @@ class PownceFS(Fuse):
 			self.token = oauth.OAuthToken.from_string(f.read())
 			f.close()
 		except Exception, e:
-			print e
 			self.token = api.auth()
 			f = open('%s/.powncefs/auth' % os.path.expanduser('~'), 'w')
 			f.write(str(self.token))
@@ -96,35 +93,47 @@ class PownceFS(Fuse):
 			return None
 
 	def getattr(self, path):
-		logging.debug('getattr %s' % path)
 		node = self._find(path)
 		if node is None:
-			return -1
+			return None
 		else:
 			return node.getattr()
 
 	def access(self, path, mode):
-		return 0
+		return None
 
 	def readdir(self, path, offset):
 		# TODO: Make this pay attention to offset
 		node = self._find(path)
-		if node is not None and isinstance(node, PownceFS.Base):
-			if node.time + API_TTL < time.time():
+		if node is not None:# and isinstance(node, __main__.Base):
+			if node.stat.st_atime + API_TTL < time.time():
 				node.fetch()
+			yield fuse.Direntry('.')
+			yield fuse.Direntry('..')
 			for n in node.children:
 				yield fuse.Direntry(n)
 
 	def read(self, path, length, offset):
 		node = self._find(path)
-		logging.debug('reading')
-		if node is not None and isinstance(node, PownceFS.File):
-			logging.debug('is a file')
-			if node.time + API_TTL < time.time():
-				logging.debug('fetching')
+		if node is not None:# and isinstance(node, __main__.File):
+			if node.stat.st_atime + API_TTL < time.time():
 				node.fetch()
-			logging.debug('really reading')
 			return node.read(length, offset)
+		else:
+			return None
+
+	class Stat(fuse.Stat):
+		def __init__(self):
+			self.st_mode = 0
+			self.st_ino = 0
+			self.st_dev = 0
+			self.st_nlink = 0
+			self.st_uid = 0
+			self.st_gid = 0
+			self.st_size = 0
+			self.st_atime = 0
+			self.st_mtime = 0
+			self.st_ctime = 0
 
 	class Base(object):
 		"""
@@ -133,28 +142,18 @@ class PownceFS(Fuse):
 
 		def __init__(self, token):
 			self.token = token
-			self.inode = inode()
-			self.time = 472545720
-			self.dev = 409089L
 			self.children = {}
 			self.name = None
+			self.stat = PownceFS.Stat()
+			self.stat.st_mode = stat.S_IFDIR | 0555
+			self.stat.st_ino = inode()
+			self.stat.st_nlink = 2
 
 		def __str__(self):
 			return str(self.name)
 
 		def getattr(self):
-			return os.stat_result((
-				stat.S_IFDIR | 0555,
-				long(self.inode),
-				self.dev,
-				2,
-				os.getuid(),
-				os.getgid(),
-				4096L,
-				int(self.time),
-				int(self.time),
-				int(self.time)
-			))
+			return self.stat
 
 		def put(self, thing):
 			"""
@@ -187,7 +186,9 @@ class PownceFS(Fuse):
 				users = rsp['friends']['users']
 				for u in users:
 					self.put(PownceFS.User(self.token, u['username']))
-				self.time = time.time()
+				self.stat.st_atime = time.time()
+				self.stat.st_mtime = self.stat.st_atime
+				self.stat.st_ctime = self.stat.st_atime
 			except:
 				pass
 
@@ -211,8 +212,10 @@ class PownceFS(Fuse):
 				notes = rsp['notes']
 				for n in notes:
 					self.put(PownceFS.File(self.token, n['file']['name'],
-						n['file']['aws_url'], n['file']['content_length']))
-				self.time = time.time()
+						n['file']['direct_url'], n['file']['content_length']))
+				self.stat.st_atime = time.time()
+				self.stat.st_mtime = self.stat.st_atime
+				self.stat.st_ctime = self.stat.st_atime
 			except:
 				pass
 
@@ -226,26 +229,14 @@ class PownceFS(Fuse):
 			self.children = None
 			self.name = name
 			self.url = url
-			self.size = size
-
-		def getattr(self):
-			return os.stat_result((
-				stat.S_IFREG | 0444,
-				self.inode,
-				self.dev,
-				1,
-				os.getuid(),
-				os.getgid(),
-				long(self.size),
-				int(self.time),
-				int(self.time),
-				int(self.time)
-			))
+			self.stat.st_mode = stat.S_IFREG | 0444
+			self.stat.st_nlink = 1
+			self.stat.st_size = size
 
 		def read(self, length, offset):
 			try:
 				f = open('%s/.powncefs/%d' % (os.path.expanduser('~'),
-					self.inode), 'r')
+					self.stat.st_ino), 'r')
 				f.seek(offset)
 				return f.read(length)
 			except:
@@ -262,15 +253,17 @@ class PownceFS(Fuse):
 				logging.debug(self.url)
 				response = urllib2.urlopen(urllib2.Request(self.url))
 				f = open('%s/.powncefs/%d' % (os.path.expanduser('~'),
-					self.inode), 'w')
+					self.stat.st_ino), 'w')
 				f.write(response.read())
 				f.close()
-				self.time = time.time()
+				self.stat.st_atime = time.time()
+				self.stat.st_mtime = self.stat.st_atime
+				self.stat.st_ctime = self.stat.st_atime
 			except:
 				pass
 
-	def main(self, *a, **kw):
-		return Fuse.main(self, *a, **kw)
+	def main(self, *args, **kw):
+		return Fuse.main(self, *args, **kw)
 
 	# Functions in the API (and in the xmp.py sample) but for which
 	# I have no use (yet)
@@ -301,7 +294,7 @@ class PownceFS(Fuse):
 	def utime(self, path, times):
 		logging.debug('[info] utime, path: %s, times: %s' % (path, times))
 	def statfs(self):
-		logging.debug('[info] statfs - what the hell is this?')
+		logging.debug('[info] statfs')
 
 def main():
 	try:
@@ -315,7 +308,7 @@ def main():
 		filemode = 'w'
 	)
 	fs = PownceFS()
-	fs.parse(values = fs, errex = 1)
+	fs.parse(errex = 1)
 	fs.main()
 
 if '__main__' == __name__:
