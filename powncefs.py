@@ -250,7 +250,6 @@ class PownceFS(Fuse):
 
 		def fetch(self):
 			try:
-				logging.debug(self.url)
 				response = urllib2.urlopen(urllib2.Request(self.url))
 				f = open('%s/.powncefs/%d' % (os.path.expanduser('~'),
 					self.stat.st_ino), 'w')
