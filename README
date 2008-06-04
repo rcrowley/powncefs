@@ -11,55 +11,58 @@ SYNOPSIS
 
 	Mac:
 
-	sudo mount -t powncefs ./powncefs.py <mountpoint>
-	ls -l
-	sudo umount python2.5@fuse0
+	./powncefs.py <mountpoint>
+	ls -l <mountpoint>
+	umount python2.5@fuse0
 
 DESCRIPTION
 	Creates a directory for each of your friends on Pownce containing
 	all of the files they've uploaded to the site.
 
 DEPENDENCIES
-	FUSE or Fuse or fuse, the Filesystem in USEr space
-	Leah's OAuth Python library
+	The short list:
+		FUSE or Fuse or fuse, the Filesystem in USEr space
+		Leah's OAuth Python library
 
-	Linux (Ubuntu):
+	Verbositized:
 
-	$ sudo apt-get install python-fuse python-json
+		Linux (Ubuntu, at least):
 
-	$ cd /usr/lib/python2.5/site-packages/
-	$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
+		$ sudo apt-get install python-fuse python-json
 
-	Mac OS X Leopard:
+		$ cd /usr/lib/python2.5/site-packages/
+		$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
 
-	Install Xcode from http://developer.apple.com/tools/download/
-	Install MacPorts 1.6 from http://www.macports.org/install.php
-	$ export PATH="/opt/local/bin:~/bin:$PATH"
-	$ export MANPATH="/opt/local/share/man:$MANPATH"
-	$ sudo port selfupdate
+		Mac OS X Leopard:
 
-	$ sudo port install macfuse fuse-bindings-python25
-	The line above will fail, so edit the fuse-bindings-python and
-	fuse-bindings-python25 Portfiles, replacing dependencies on fusefs
-	and libfuse with dependencies on macfuse
-	$ sudo port install macfuse fuse-bindings-python25
+		Install Xcode from http://developer.apple.com/tools/download/
+		Install MacPorts 1.6 from http://www.macports.org/install.php
+		$ export PATH="/opt/local/bin:~/bin:$PATH"
+		$ export MANPATH="/opt/local/share/man:$MANPATH"
+		$ sudo port selfupdate
 
-	$ sudo port install py25-hashlib
-	$ cd /opt/local/lib/python2.5/site-packages/
-	$ sudo port install wget
-	$ sudo wget \
-	  http://internap.dl.sourceforge.net/sourceforge/json-py/json-py-3_4.zip
-	$ sudo unzip json-py-3_4.zip \*.py
-	$ sudo rm json-py-3_4.zip
+		$ sudo port install macfuse fuse-bindings-python25
+		This will fail, so edit the fuse-bindings-python and
+		fuse-bindings-python25 Portfiles, replacing dependencies on fusefs
+		and libfuse with dependencies on macfuse
+		$ sudo port install macfuse fuse-bindings-python25
 
-	$ cd /opt/local/lib/python2.5/site-packages/
-	$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
+		$ sudo port install py25-hashlib
+		$ cd /opt/local/lib/python2.5/site-packages/
+		$ sudo port install wget
+		$ sudo wget \
+		  http://internap.dl.sourceforge.net/sourceforge/json-py/json-py-3_4.zip
+		$ sudo unzip json-py-3_4.zip \*.py
+		$ sudo rm json-py-3_4.zip
+
+		$ cd /opt/local/lib/python2.5/site-packages/
+		$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth
 
 VERSION
 	0.2
 
 DATE
-	2008-05-25
+	2008-06-03
 
 AUTHOR
 	Richard Crowley <r@rcrowley.org>
