@@ -1,0 +1,29 @@
+#!/bin/sh
+
+#
+# mp3plz
+# Richard Crowley <r@rcrowley.org>
+#
+# Use PownceFS to download all of the MP3s your friends have uploaded.
+#
+
+if [ -z "$1" ] ; then
+	echo "Usage: $0 <mountpoint> <destination>"
+	exit
+fi
+if [ -z "$2" ] ; then
+	echo "Usage: $0 <mountpoint> <destination>"
+	exit
+fi
+MNT=$1
+DEST=$2
+
+for friend in $(ls -1 $MNT) ; do
+	echo "[mp3plz] copying MP3s uploaded by $friend"
+	mkdir $DEST/$friend
+	find $MNT/$friend -name '*.mp3' | while read file ; do
+		echo "[mp3plz] copying $file"
+		dest=`echo $file | sed "s/$MNT/$DEST/"`
+		cp "$file" "$dest"
+	done
+done
