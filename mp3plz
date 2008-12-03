@@ -20,7 +20,7 @@ DEST=$2
 
 for friend in $(ls -1 $MNT) ; do
 	echo "[mp3plz] copying MP3s uploaded by $friend"
-	mkdir $DEST/$friend
+	mkdir -p $DEST/$friend
 	find $MNT/$friend -name '*.mp3' | while read file ; do
 		echo "[mp3plz] copying $file"
 		dest=`echo $file | sed "s/$MNT/$DEST/"`
