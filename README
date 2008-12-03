@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
 
-	Linux:
+	Linux, as root:
 
 	./powncefs.py <mountpoint>
 	ls -l <mountpoint>
